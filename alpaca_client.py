@@ -2,10 +2,19 @@ from alpaca.trading.client import TradingClient
 from alpaca.trading.requests import MarketOrderRequest, GetOrdersRequest
 from alpaca.trading.enums import TimeInForce, QueryOrderStatus
 from alpaca.data.live import StockDataStream
+import json
+
+# Load API keys from config.json
+with open('config.json', 'r') as f:
+    config = json.load(f)
+
+API_KEY = config['API_KEY']
+API_SECRET = config['API_SECRET']
+BASE_URL = config['BASE_URL']
 
 
-trading_client = TradingClient("PKVMHGJS9OAE1W5SWCRD", "WUo8NQxuTyNBbnBJSSZgCGYOimyPYT8626BXbdVF")
-stream = StockDataStream("PKVMHGJS9OAE1W5SWCRD", "WUo8NQxuTyNBbnBJSSZgCGYOimyPYT8626BXbdVF")
+trading_client = TradingClient(API_KEY, API_SECRET)
+stream = StockDataStream(API_SECRET, API_SECRET)
 
 
 def get_positions():
