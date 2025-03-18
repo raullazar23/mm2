@@ -3,11 +3,12 @@ from alpaca_client import API_SECRET, API_KEY
 import buy_strategy as buy_strategy
 from alpaca.trading.enums import OrderSide
 import time
+import sys
 
 stream = alpaca_client.StockDataStream(API_KEY, API_SECRET)
 price_history = []
 vwap_history = []
-symbol = "BTC/USD"
+symbol = sys.argv[1]
 
 
 async def handle_trade(trade):
