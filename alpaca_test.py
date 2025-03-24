@@ -1,4 +1,5 @@
 import alpaca_client as alpaca_client
+import utils as utils
 from alpaca_client import API_SECRET, API_KEY
 import buy_strategy as buy_strategy
 from alpaca.trading.enums import OrderSide
@@ -37,7 +38,7 @@ async def handle_trade(trade, symbols):
             # Check buy conditions
             if buy_strategy.check_buy_conditions(trade.price, symbol, price_history[symbol], vwap_history[symbol]):
                 try:
-                    alpaca_client.place_order(symbol, 3, OrderSide.BUY)
+                    alpaca_client.place_order(symbol, utils.get_quantity(symbol) , OrderSide.BUY)
                     print(f"Bought 3 shares of {symbol}")
                     time.sleep(2)
                 except Exception as e:

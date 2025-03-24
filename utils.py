@@ -1,6 +1,7 @@
 from datetime import datetime
 import pytz
 import time
+import json
 
 # Define Eastern Time Zone
 eastern = pytz.timezone("US/Eastern")
@@ -26,3 +27,13 @@ def check_trading_hours():
         print("Not trading hours")
         time.sleep(600)
         return
+    
+# Load JSON config
+with open("symbols_quant.json", "r") as file:
+    config = json.load(file)
+
+stocks = config["stocks"]
+
+# Function to get quantity by symbol
+def get_quantity(symbol):
+    return stocks.get(symbol, "Symbol not found")
