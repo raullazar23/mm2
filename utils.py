@@ -1,4 +1,5 @@
 from datetime import datetime
+from alpaca_client import trading_client
 import pytz
 import time
 import json
@@ -37,3 +38,17 @@ stocks = config["stocks"]
 # Function to get quantity by symbol
 def get_quantity(symbol):
     return stocks.get(symbol, "Symbol not found")
+
+def get_pnl(symbol):
+    try:
+        position = trading_client.get_open_position(symbol)
+        
+        # Extract P&L data
+        unrealized_pl = float(position.unrealized_pl)
+        realized_pl = float(position.realized_pl)
+        total_pl = unrealized_pl + realized_pl
+        
+        return total_pl
+    except Exception as e:
+        print(f"Error retrieving P&L for {symbol}: {e}")
+        return None

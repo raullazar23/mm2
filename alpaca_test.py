@@ -53,7 +53,7 @@ async def handle_trade(trade, symbols):
     positions = alpaca_client.get_position(symbol)
     print(f"{symbol} - Entry Price: {positions.avg_entry_price}, Current Price: {trade.price}")
 
-    if trade.price - float(positions.avg_entry_price) >= 0.15:
+    if utils.get_pnl(symbol) >= 0.4:
         try:
             alpaca_client.place_order(symbol, positions.qty, OrderSide.SELL)
             print(f"Successful trade on {symbol}")
