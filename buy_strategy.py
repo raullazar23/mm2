@@ -1,4 +1,8 @@
 import numpy as np
+import alpaca_client as alpaca_client
+import utils as utils
+import time
+from alpaca.trading.enums import OrderSide
 from alpaca_client import API_SECRET, API_KEY, trading_client
 from alpaca.data.historical import StockHistoricalDataClient
 from alpaca.data.requests import StockLatestBarRequest
@@ -37,3 +41,31 @@ def check_buy_conditions(current_price, symbol, price_history, vwap_history):
     if short_ema > long_ema and current_price > vwap:
         return True
 
+
+def buy_stock(symbol, price_history, vwap_history, trade):
+        if utils.check_trading_hours(trading_client):
+            print(f"Trade ignored for {symbol} during last half hour of trading.")
+            return
+     # No position, store trade price history
+        price_history.setdefault(symbol, []).append(trade.price)
+        if len(price_history[symbol]) > ema_long_window:
+            price_history[symbol] = price_history[symbol][-ema_long_window:]
+
+        # Store VWAP history
+        vwap_history.setdefault(symbol, []).append(calculate_vwap(symbol))
+        if len(vwap_history[symbol]) > 10:
+            vwap_history[symbol] = vwap_history[symbol][-10:]
+
+            # Check buy conditions
+            if check_buy_conditions(trade.price, symbol, price_history[symbol], vwap_history[symbol]):
+                try:
+                    alpaca_client.place_order(symbol, utils.get_quantity(symbol) , OrderSide.BUY)
+                    print(f"Bought 3 shares of {symbol}")
+                    time.sleep(2)
+                except Exception as e:
+                    print(e)
+            else:
+                print(f"No buy conditions met for {symbol}: {vwap_history[symbol]}")
+        else:
+            print(f"Not enough data for buy conditions for {symbol}")
+        return

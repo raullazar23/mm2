@@ -2,7 +2,10 @@ from alpaca.trading.client import TradingClient
 from alpaca.trading.requests import MarketOrderRequest, GetOrdersRequest
 from alpaca.trading.enums import TimeInForce, QueryOrderStatus
 from alpaca.data.live import StockDataStream
+from alpaca.trading.enums import OrderSide
 import json
+import time
+import utils
 
 # Load API keys from config.json
 with open('config.json', 'r') as f:
@@ -62,3 +65,32 @@ def close_position(symbol):
         trading_client.close_position(symbol)
     except Exception as e:
         print(e)
+
+def check_selling_condition(symbol, trade):
+    if utils.is_last_half_hour_trade_day(trading_client):
+        process_last_half_hour_trade(trade, symbol)
+
+    positions = get_position(symbol)
+    print(f"{symbol} - Entry Price: {positions.avg_entry_price}, Current Price: {trade.price}")
+
+    if trade.price - float(positions.avg_entry_price) >= 0.15:
+        try:
+            place_order(symbol, positions.qty, OrderSide.SELL)
+            print(f"Successful trade on {symbol}")
+            time.sleep(2)
+        except Exception as e:
+            print(e)
+
+
+def process_last_half_hour_trade(trade, symbol):
+    positions = get_position(symbol)
+    print(f"Processing trade for {trade.symbol} during the last half hour of trading.")
+
+    if trade.price - float(positions.avg_entry_price) >= -1:
+        try:
+            place_order(symbol, positions.qty, OrderSide.SELL)
+            print(f"Successful trade on {symbol}")
+            time.sleep(2)
+        except Exception as e:
+            print(e)
+
