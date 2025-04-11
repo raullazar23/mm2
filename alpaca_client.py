@@ -66,14 +66,20 @@ def close_position(symbol):
     except Exception as e:
         print(e)
 
-def check_selling_condition(symbol, trade):
+def check_selling_condition(symbol, trade, alpaca_client):
+    try:
+        positions = alpaca_client.get_position(symbol)
+    except Exception as e:
+        print(e)
+        return
     if utils.is_last_half_hour_trade_day(trading_client):
         process_last_half_hour_trade(trade, symbol)
+        return
 
     positions = get_position(symbol)
     print(f"{symbol} - Entry Price: {positions.avg_entry_price}, Current Price: {trade.price}")
 
-    if get_pnl(symbol) >= 0.20:
+    if get_pnl(symbol) >= 0.40:
         try:
             place_order(symbol, positions.qty, OrderSide.SELL)
             print(f"Successful trade on {symbol}")
@@ -107,3 +113,15 @@ def get_pnl(symbol):
     except Exception as e:
         print(f"Error retrieving P&L for {symbol}: {e}")
         return None
+
+
+def validate_symbols(initial_symbols):
+    """Ensure all symbols are valid Alpaca assets."""
+    valid_symbols = []
+    for symbol in initial_symbols:
+        try:
+            asset = trading_client.get_asset(symbol)
+            valid_symbols.append(symbol)
+        except Exception as e:
+            print(f"Error fetching asset for {symbol}: {e}")
+    return valid_symbols

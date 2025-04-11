@@ -1,8 +1,14 @@
 {
     "stocks": {
-        "INTC": 10,
-        "F": 20,
-        "ETSY": 3,
-        "UTI": 9
+        "T": 5,
+        "COKE": 2,
+        "PFE": 5,
+        "VZ": 6,
+        "KO": 2,
+        "WMT": 2,
+        "GE": 3,
+        "CSCO": 4,
+        "ABT": 2,
+        "MSFT": 1
         }
 }
