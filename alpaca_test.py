@@ -1,6 +1,6 @@
 import alpaca_client as alpaca_client
 import utils as utils
-from alpaca_client import API_SECRET, API_KEY
+from alpaca_client import API_SECRET, API_KEY, trading_client
 import buy_strategy as buy_strategy
 import sys
 import json
@@ -25,12 +25,15 @@ async def handle_trade(trade, symbols):
     symbol = trade.symbol  # Trade event will already contain the stock symbol
     open_positions = alpaca_client.get_positions()
     if len(open_positions) < 5:
-        try:
-            positions = alpaca_client.get_position(symbol)
-            should_skip_sell_iteration = True
-        except Exception as e:
-            buy_strategy.buy_stock(symbol, price_history, vwap_history, trade)
-            return
+        if utils.is_last_half_hour_trade_day(trading_client):
+            print("Last half hour of trading, skipping buy.")
+        else:    
+            try:
+                positions = alpaca_client.get_position(symbol)
+                should_skip_sell_iteration = True
+            except Exception as e:
+                buy_strategy.buy_stock(symbol, price_history, vwap_history, trade)
+                return
         
     if (should_skip_sell_iteration):
         alpaca_client.check_selling_condition(symbol, trade, alpaca_client)

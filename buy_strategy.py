@@ -46,9 +46,6 @@ def buy_stock(symbol, price_history, vwap_history, trade):
         if utils.check_trading_hours(trading_client):
             print(f"Trade ignored for {symbol} during first half hour of trading.")
             return
-        if utils.is_last_half_hour_trade_day(trading_client):
-            print(f"Trade ignored for {symbol} during last half hour of trading.")
-            return
      # No position, store trade price history
         price_history.setdefault(symbol, []).append(trade.price)
         if len(price_history[symbol]) > ema_long_window:

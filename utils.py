@@ -21,12 +21,15 @@ def check_trading_hours(client):
         today_open = (clock.next_close - now).total_seconds()
         if (timeframe - today_open) <= 1800:
             return True
-    return False
+    else:
+        print ("Trading hours are closed.")
+        return True
 
 def is_last_half_hour_trade_day(client):
     clock = client.get_clock()
     now = clock.timestamp
     if clock.is_open:
-        last_half_hour = (now - clock.next_close).total_seconds() <= 900 # 15 minutes
+        last_half_hour = (clock.next_close - now).total_seconds() <= 900 # 15 minutes
         return last_half_hour
-    return False
+    print ("Trading hours are closed. (last half hour)")
+    return True
