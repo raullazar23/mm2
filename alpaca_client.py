@@ -73,7 +73,7 @@ def check_selling_condition(symbol, trade):
     positions = get_position(symbol)
     print(f"{symbol} - Entry Price: {positions.avg_entry_price}, Current Price: {trade.price}")
 
-    if trade.price - float(positions.avg_entry_price) >= 0.15:
+    if get_pnl(symbol) >= 0.20:
         try:
             place_order(symbol, positions.qty, OrderSide.SELL)
             print(f"Successful trade on {symbol}")
@@ -94,3 +94,16 @@ def process_last_half_hour_trade(trade, symbol):
         except Exception as e:
             print(e)
 
+def get_pnl(symbol):
+    try:
+        position = trading_client.get_open_position(symbol)
+        
+        # Extract P&L data
+        unrealized_pl = float(position.unrealized_pl)
+        realized_pl = float(position.realized_pl)
+        total_pl = unrealized_pl + realized_pl
+        
+        return total_pl
+    except Exception as e:
+        print(f"Error retrieving P&L for {symbol}: {e}")
+        return None
